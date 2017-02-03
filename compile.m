@@ -1,0 +1,1 @@
+compileMexOpenMP('fastem.cpp')
