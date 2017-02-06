@@ -27,7 +27,7 @@ weights = weights/sum(weights);
 % Plot results
 figure(1)
 clf
-h1 = scatter(samples(1,:), samples(2,:));
+h1 = scatter(samples(1,:), samples(2,:), 30*L*weights);
 hold on
 for i=1:n
     h2 = error_ellipse(Cs(:,:,i), mus(:,i),'style','r');

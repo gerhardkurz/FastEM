@@ -38,6 +38,8 @@ For further information, take a look at the included demos, which can be run usi
 	>> demo2
 	>> demo3
 
+![demo1](demo1.png)
+
 License
 -------
 
