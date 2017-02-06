@@ -6,26 +6,30 @@
 #include <chrono>
 #include <random>
 
-/* FastEM by Gerhard Kurz
- * 
- * Usage:
- * [means, covariances, weights] = fastem(data, sampleWeights, n)
- * Arguments:
- *      data
- *          samples as d x m Matrix (d dimensions, m samples)
- *      sampleWeights 
- *          1 x m row vector
- *      n
- *          number of Gaussian components to fit
- * Returns:
- *      means 
- *          d x n matrix with mean vectors
- *      covariances
- *          d x d x n tensor with covariance matrices
- *      weights
- *          1 x n vector with weight of each Gaussian component
- */
-
+void usage(){
+    std::stringstream ss;
+            
+    ss  << "FastEM by Gerhard Kurz\n"
+        << "\n"
+        << "Usage:\n"
+        << "    [means, covariances, weights] = fastem(data, sampleWeights, n)\n"
+        << "Parameters:\n"
+        << "    data\n"
+        << "        samples as d x m Matrix (d dimensions, m samples)\n"
+        << "    sampleWeights\n"
+        << "        1 x m row vector\n"
+        << "	n\n"
+        << "        number of Gaussian components to fit\n"
+        << "Returns:\n"
+        << "    means\n"
+        << "        d x n matrix with mean vectors\n"
+        << "    covariances\n"
+        << "        d x d x n tensor with covariance matrices\n"
+        << "    weights\n"
+        << "        1 x n vector with weight of each Gaussian component\n";
+            
+    mexPrintf("%s", ss.str().c_str());
+}
 
 Eigen::VectorXd logmvnpdf(const Mex::ConstMatrixXd &X, const Eigen::VectorXd &mu, const Eigen::MatrixXd &C){
     // Logarithm of multivariate normal distrbution probability density
@@ -63,8 +67,6 @@ void kmeansplusplus(const Mex::ConstMatrixXd &samples, const Mex::ConstRowVector
     // Performs kmeans++ initialization
     const int nSamples = samples.cols(); 
     
-    //std::ostringstream sout;
- 
     std::random_device rd;     // only used once to initialise (seed) engine
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     
@@ -109,24 +111,23 @@ void emalgo(Mex::ConstMatrixXd &samples, Mex::ConstRowVectorXd &sampleWeights, i
     Eigen::MatrixXd gamma{nSamples,nGauss}; //gamma(i,j) = weight for sample i, component j
     
     std::ostringstream sout;
-    
-    //todo error handling/covariance regularization
-   
+  
     //init
     //initialize covariances with sample covariance?
-    
     //todo normalize sampleweights
+    
     for(int iGauss=0; iGauss<nGauss; iGauss++){
         //means.col(iGauss) = samples.col(iGauss); //todo randomize
         covariances.slice(iGauss) = Eigen::MatrixXd::Identity(dim, dim);
         weights(iGauss) = 1.0/nGauss;
     }
+    // obtain means using kmeansplusplus
     kmeansplusplus(samples, sampleWeights, nGauss, means);
     
     const int maxIter = 10; //max number of iterations
-    double oldloglikelihood = -DBL_MAX;
     const double threshold = 1E-5; //abort when likelihood improvement is less than threshold
     const double reg = 1E-6; //regularization to prevent numerical issues: maybe choose depending on data?
+    double oldloglikelihood = -DBL_MAX; //likelihood from previous iteration
     
     for(int iter=0; iter<maxIter; iter++){
         std::chrono::time_point<std::chrono::high_resolution_clock> start;
@@ -212,19 +213,17 @@ void emalgo(Mex::ConstMatrixXd &samples, Mex::ConstRowVectorXd &sampleWeights, i
     sout.str("");
 }
 
-
 void mexFunction(int numOutputs, mxArray *outputs[],
                  int numInputs, const mxArray *inputs[])
 {
     try {
         /* Check for proper number of arguments */
-        // todo better usage documentation
         if (numInputs != 3) {
             throw std::invalid_argument("Three inputs are required.");
         }
         
         if (numOutputs != 3) {
-            throw std::invalid_argument("Three outputs is required.");
+            throw std::invalid_argument("Three outputs are required.");
         }
         
         Mex::ConstMatrixXd samples(inputs[0]);
@@ -235,7 +234,7 @@ void mexFunction(int numOutputs, mxArray *outputs[],
         Mex::ConstRowVectorXd sampleWeights(inputs[1]);
 
         if (sampleWeights.cols() != numSamples) {
-            throw std::invalid_argument("invalid weights");
+            throw std::invalid_argument("Number of weights has to match the number of samples.");
         }
                
         const unsigned int n = *mxGetPr(inputs[2]);
@@ -256,6 +255,7 @@ void mexFunction(int numOutputs, mxArray *outputs[],
         outputs[1] = covariances;
         outputs[2] = weights;
     } catch (std::exception& ex) {
+        usage();
         mexErrMsgTxt(ex.what());
     }
 }
