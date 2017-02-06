@@ -1,14 +1,14 @@
 FastEM for Matlab
 =================
 
-FastEM is an efficient implementation of the expectation maximization (EM) algorithm in MATLAB.
+FastEM is an efficient implementation of the expectation maximization (EM) algorithm in MATLAB. The EM algorithm can be used for clustering data and approximation with Gaussian mixture densities.
 
 Requirements
 ------------
 
   * a reasonably recent version of MATLAB
   * a C++ Compiler (tested with Visual Studio 2015)
-  * [https://bitbucket.org/nonlinearestimation/toolbox/](Nonlinear Estimation Toolbox)
+  * [Nonlinear Estimation Toolbox](https://bitbucket.org/nonlinearestimation/toolbox/)
 
 Features
 --------
@@ -25,7 +25,7 @@ First, compile the mex file by adding the Nonlinear Estimation Toolbox to the MA
 
 	>> compile
 
-You can then run FastEM using
+THen, you can run FastEM using
 
 	>> [mus, Cs, ws] = fastem(samples, weights, n);
 
