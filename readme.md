@@ -22,9 +22,21 @@ Features
 Example usage
 -------------
 First, compile the mex file by adding the Nonlinear Estimation Toolbox to the MATLAB path and then calling
+
 	>> compile
 
+You can then run FastEM using
 
+	>> [mus, Cs, ws] = fastem(samples, weights, n);
+
+Here, samples is a matrix where each column represents a sample, weights is a row vector summing to one, where each entry is the weight of a sample and n is the number of Gaussian components to fit. 
+The return values are a matrix containing all mean vectors, a tensor containing all covariance matrices and a row vector containing the weights of each Gaussian component.
+
+For further information, take a look at the included demos, which can be run using
+
+	>> demo1
+	>> demo2
+	>> demo3
 
 License
 -------
