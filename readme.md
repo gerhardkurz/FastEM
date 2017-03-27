@@ -25,7 +25,7 @@ First, compile the mex file by adding the Nonlinear Estimation Toolbox to the MA
 
 	>> compile
 
-THen, you can run FastEM using
+Then, you can run FastEM using
 
 	>> [mus, Cs, ws] = fastem(samples, weights, n);
 
